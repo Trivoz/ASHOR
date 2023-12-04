@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-use log::{debug, error, info};
+use log::{debug, error};
 use std::error::Error;
-use std::process::{Child, ChildStdout, Command};
+use std::process::{Child, Command};
 
 use crate::path::invoke_output;
-use crate::path::Variable;
+
 use std::path;
 
 /// Invoke a system command
@@ -96,8 +96,8 @@ impl Shell {
     /// let shell = Shell::new();
     /// ```
     pub fn new() -> Self {
-        let has_system_config: bool;
-        let has_user_config: bool;
+        let _has_system_config: bool;
+        let _has_user_config: bool;
 
         Self {
             is_default: Self::is_default(),

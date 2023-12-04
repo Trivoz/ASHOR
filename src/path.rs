@@ -53,7 +53,7 @@ pub fn invoke_output(name: String) -> Option<ChildStdout> {
     let result = invoke_system_command(name.as_str(), None);
     match result {
         Ok(result) => result.stdout,
-        Err(err) => None,
+        Err(_err) => None,
     }
 }
 
