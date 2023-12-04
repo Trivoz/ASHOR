@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#![allow(non_snake_case)]
 
 use log::{debug, error, log_enabled, info, Level};
 
