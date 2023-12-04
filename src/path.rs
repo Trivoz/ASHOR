@@ -50,7 +50,6 @@ pub trait Variable {
 ///  * Some - the value of the variable
 ///  * None - `None`.
 pub fn invoke_output(name: &mut String) -> Option<ChildStdout> {
-
     // this is assuming that $ isn't already in this string.
     // XXX: handle this case maybe?
     name.insert_str(0, " $");

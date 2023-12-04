@@ -22,9 +22,13 @@ mod shell;
 use env_logger::Env;
 use shell::Shell;
 
+/// The log level that is sought to when there is none found in the system path.
+const DEFAULT_LOG_LEVEL: &'static str = "error";
+
 fn main() {
-    env_logger::Builder::from_env(Env::default().default_filter_or("debug")).init();
+    env_logger::Builder::from_env(Env::default().default_filter_or("error")).init();
 
     let shell = Shell::new();
+
     shell.stdout_debug_info();
 }

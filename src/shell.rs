@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-use log::{info, error};
+use log::{error, info};
 use std::error::Error;
 use std::process::{Child, Command};
 
@@ -54,7 +54,61 @@ pub fn invoke_system_command(
     }
 }
 
+mod Prefix {
+
+
+    use super::Command;
+
+    enum _PrefixType {
+        /// The current working directory
+        Directory,
+        /// A custom string
+        Custom,
+    }
+
+    struct _PrefixValue(String);
+
+    struct _PrefixData {
+        value: _PrefixValue,
+        variant: _PrefixType,
+    }
+
+    impl _PrefixData {
+        /// When given a value of Some String,
+        /// the PrefixVariant type will be assigned Custom.
+        ///
+        /// Otherwise, the current working directory will be assigned as the variant.
+        fn _new(this: Option<_PrefixValue>) -> Self {
+            if this.is_some() {
+                Self {
+                    value: this.unwrap(),
+                    variant: _PrefixType::Custom,
+                }
+            } else {
+                let child = super::invoke_system_command("pwd", Some(&vec!["-L".to_string()]));
+                // FIXME: there has to be some better way to do this, right?
+                let cmd = Command::new("")
+                    .stdin(child.unwrap().stdout.unwrap())
+                    .output()
+                    .expect("couldn't get command data ...");
+                let prefix_string: String = std::str::from_utf8(&cmd.stdout)
+                    .expect("couldn't decode...")
+                    .into();
+
+                Self {
+                    // FIXME: value needs error handling
+                    value: _PrefixValue { 0: prefix_string },
+                    variant: _PrefixType::Directory,
+                }
+            }
+        }
+    }
+}
+
 pub struct Shell {
+    /// The prefix of the shell
+    // FIXME: prefix is all broken
+    // pub prefix: PrefixType,
     /// Is the shell the default shell?
     pub is_default: bool,
     /// Has system config in /etc/ashor/ashor.toml
@@ -106,13 +160,33 @@ impl Shell {
     /// # Example
     ///
     /// ```rust,no_test
-    /// let shell = Shell::new();
+    /// let shell = Shell::new(None);  // None = use default prefix (string)
     /// ```
     pub fn new() -> Self {
+        /*
+         * TODO: This.
+         *
+         * ```rust
+         * let mut data = { if shell_prefix.is_none() { Prefix::PrefixData::new() } else { shell_prefix } }
+         * let prefix_type: Prefix::PrefixType<T> = if shell_prefix.is_none() { Prefix::PrefixType::Directory; } else { shell_prefix.unwrap() };
+         * let prefix = match prefix_type { Prefix::PrefixType::Directory => { // Assert that the directory is valid dbg!(); } Prefix::PrefixType::Custom => { // some stuff dbg!(); } };
+         * ```
+         *
+         * which is then implemented like
+         * ```rust
+         * Self {
+         *     prefix: todo!() // some sort of prefix
+         *     is_default: Self::is_default(),
+         *     has_user_config: Self::user_config_exists(),
+         *     has_system_config: Self::system_config_exists(),
+         * }
+         * ```
+         */
+
         Self {
             is_default: Self::is_default(),
             has_user_config: Self::user_config_exists(),
-            has_system_config: Self::system_config_exists()
+            has_system_config: Self::system_config_exists(),
         }
     }
 }
