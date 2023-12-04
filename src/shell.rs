@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-use log::error;
+use log::{debug, error, info};
 use std::error::Error;
 use std::process::{Child, ChildStdout, Command};
 
@@ -42,13 +42,14 @@ pub fn invoke_system_command(
     name: &str,
     arguments: Option<&Vec<String>>,
 ) -> Result<Child, Box<dyn Error>> {
+    debug!("args: {:?}", arguments);
     match Command::new(name)
         .args(arguments.unwrap_or(&Vec::new()))
         .spawn()
     {
         Ok(cout) => Ok(cout),
         Err(e) => {
-            error!("Failed to call {} {:?}", name, arguments.unwrap());
+            error!("Failed to call {}", name);
             Err(Box::new(e))
         }
     }
@@ -62,9 +63,11 @@ pub mod test {
     }
 }
 
-struct Shell {
+pub struct Shell {
     /// Is the shell the default shell?
-    default: bool,
+    ///
+    /// TODO: make this private when its not used
+    pub is_default: bool,
     /// Has system config in /etc/ashor/config.toml
     // has_system_config: bool,
     // TODO: this.
@@ -97,7 +100,7 @@ impl Shell {
         let has_user_config: bool;
 
         Self {
-            default: Self::is_default(),
+            is_default: Self::is_default(),
             has_user_config: path::Path::new(Self::USER_CONFIG_PATH).exists(),
         }
     }

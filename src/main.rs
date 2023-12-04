@@ -19,6 +19,13 @@
 mod path;
 mod shell;
 
-use log::{debug, error, info, log_enabled, Level};
+use env_logger::Env;
+use log::debug;
+use shell::Shell;
 
-fn main() {}
+fn main() {
+    env_logger::Builder::from_env(Env::default().default_filter_or("debug")).init();
+
+    let shell = Shell::new();
+    debug!("default shell: {}", shell.is_default)
+}

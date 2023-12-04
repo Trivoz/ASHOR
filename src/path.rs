@@ -50,7 +50,7 @@ pub trait Variable {
 ///  * None - `None`.
 pub fn invoke_output(name: String) -> Option<ChildStdout> {
     // FIXME: prepend $ to name
-    let mut result = invoke_system_command(name.as_str(), None);
+    let result = invoke_system_command(name.as_str(), None);
     match result {
         Ok(result) => result.stdout,
         Err(err) => None,
