@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-use log::{debug, error};
+use log::{info, error};
 use std::error::Error;
 use std::process::{Child, Command};
 
@@ -42,7 +42,6 @@ pub fn invoke_system_command(
     name: &str,
     arguments: Option<&Vec<String>>,
 ) -> Result<Child, Box<dyn Error>> {
-    debug!("args: {:?}", arguments);
     match Command::new(name)
         .args(arguments.unwrap_or(&Vec::new()))
         .spawn()
@@ -55,24 +54,14 @@ pub fn invoke_system_command(
     }
 }
 
-#[cfg(test)]
-pub mod test {
-    #[test]
-    fn invoke_system_command() {
-        assert!(true)
-    }
-}
-
 pub struct Shell {
     /// Is the shell the default shell?
-    ///
-    /// TODO: make this private when its not used
     pub is_default: bool,
-    /// Has system config in /etc/ashor/config.toml
-    // has_system_config: bool,
+    /// Has system config in /etc/ashor/ashor.toml
+    pub has_system_config: bool,
+    /// Has user config in $XDG_CONFIG_HOME/ashor/ashor.toml
+    pub has_user_config: bool,
     // TODO: this.
-    /// Has user config in $XDG_CONFIG_HOME/ashor/config.toml
-    has_user_config: bool,
     // /// System variables in the path
     // // TODO somehow make system_variables impl Sized
     // // system_variables: Vec<dyn Variable>
@@ -82,10 +71,34 @@ impl Shell {
     /// The user configuation path wherein the configuration file is stored
     // TODO: make ashor.toml just config.toml instead (globally for user and system)
     const USER_CONFIG_PATH: &'static str = "~/.config/ashor/ashor.toml";
+    const SYSTEM_CONFIG_PATH: &'static str = "/etc/ashor/ashor.toml";
 
     /// Returns if 'ashor' is the default shell
     fn is_default() -> bool {
-        invoke_output("SHELL".to_string()).is_some()
+        let mut get_shell_command = String::from("SHELL");
+        invoke_output(&mut get_shell_command).is_some()
+    }
+
+    /// Show debugging information in the console
+    ///
+    /// Note: these are called with the info! macro, also this function is public
+    /// because its intended to be accessed from other files as a class method
+    pub fn stdout_debug_info(&self) -> () {
+        info!("default_shell: {}", &self.is_default);
+        info!("user config: {}", &self.has_user_config);
+        info!("system config: {}", &self.has_system_config);
+    }
+
+    /// Returns if the user config file exists
+    fn user_config_exists() -> bool {
+        let user_path = path::Path::new(Self::USER_CONFIG_PATH);
+        user_path.exists()
+    }
+
+    /// Returns if the system config file exists
+    fn system_config_exists() -> bool {
+        let system_path = path::Path::new(Self::SYSTEM_CONFIG_PATH);
+        system_path.exists()
     }
 
     /// Create an instance of [`Shell`]
@@ -96,12 +109,10 @@ impl Shell {
     /// let shell = Shell::new();
     /// ```
     pub fn new() -> Self {
-        let _has_system_config: bool;
-        let _has_user_config: bool;
-
         Self {
             is_default: Self::is_default(),
-            has_user_config: path::Path::new(Self::USER_CONFIG_PATH).exists(),
+            has_user_config: Self::user_config_exists(),
+            has_system_config: Self::system_config_exists()
         }
     }
 }

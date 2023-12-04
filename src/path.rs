@@ -48,9 +48,14 @@ pub trait Variable {
 /// # Returns `Option<&str>`
 ///  * Some - the value of the variable
 ///  * None - `None`.
-pub fn invoke_output(name: String) -> Option<ChildStdout> {
-    // FIXME: prepend $ to name
-    let result = invoke_system_command(name.as_str(), None);
+pub fn invoke_output(name: &mut String) -> Option<ChildStdout> {
+
+    // this is assuming that $ isn't already in this string.
+    // XXX: handle this case maybe?
+    name.insert_str(0, " $");
+
+    let result = invoke_system_command("echo", Some(&vec![name.to_string()]));
+
     match result {
         Ok(result) => result.stdout,
         Err(_err) => None,
@@ -58,7 +63,7 @@ pub fn invoke_output(name: String) -> Option<ChildStdout> {
 }
 
 /// Represents the global system path which contains environment variables.
-pub struct Path<T: Variable> {
+pub struct _Path<T: Variable> {
     /// A vector of variables that implement [`variable`].
     ///
     /// [`variable`]: [`variable`][`Variable`]
