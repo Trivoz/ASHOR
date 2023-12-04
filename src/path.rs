@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//! TODO: file docstring
-//! TODO: add 'OSTYPE' variable to config loader
+/! contains path-related traits and structs
+
+// TODO: add 'OSTYPE' variable to config loader
 
 use crate::shell::invoke_system_command;
 use std::process::ChildStdout;

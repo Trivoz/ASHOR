@@ -31,8 +31,8 @@ use std::path;
 ///
 /// # Returns
 ///
-/// A result type that either takes [`std::process::Child`] or [`dyn std::error::Error`]
-/// contained in a [`Box`]
+/// A result type that either takes [`std::process::Child`] or a box value that implies the [`std::error::Error`]
+/// trait.
 ///
 /// ## Resources
 ///
