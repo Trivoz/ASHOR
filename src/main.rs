@@ -19,6 +19,9 @@
 mod path;
 mod shell;
 
+use std::fs;
+use std::io::{self, Write};
+
 use env_logger::Env;
 use shell::Shell;
 
@@ -31,4 +34,44 @@ fn main() {
     let shell = Shell::new();
 
     shell.stdout_debug_info();
+
+    // see 91f7a78 for more implementation ideas
+    let prefix = String::from(">>> ");
+
+    'running: loop {
+        // holds whatever the user should choose to type in
+        // (right now its an empty buffer)
+        let mut buffer = String::new();
+
+        // create an input buffer
+        let stdin = io::stdin();
+
+        // Ensure the input buffer contents is loaded before reading into the string buffer
+        io::stdout().flush().unwrap();
+
+        // copy the input buffer into the empty string buffer
+        stdin.read_line(&mut buffer).unwrap();
+
+        match buffer.as_str() {
+            "clear" => {
+                unimplemented!()
+            }
+            "help" => {
+                unimplemented!()
+            }
+            "ashor" => {
+                unimplemented!()
+            }
+            "ls" => {
+                unimplemented!()
+            }
+            _ => {
+                // print out a new line
+                print!("{}", prefix);
+            }
+        }
+
+        // Once each case has been handled, clear the string inside the buffer
+        buffer.clear();
+    }
 }
