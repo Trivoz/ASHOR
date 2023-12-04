@@ -21,24 +21,4 @@ mod shell;
 
 use log::{debug, error, info, log_enabled, Level};
 
-/// Main function
-///
-/// # Implementations
-///
-/// ## Logging
-///
-/// * Implemented logging boilerplate in commit `cb03349`
-///
-/// ```rust,no_run
-/// env_logger::init();
-///
-/// debug!("This is a debug {}", "message");
-/// error!("This is printed by default");
-///
-/// if log_enabled!(Level::Info) {
-///     let x = 3 * 4; // expensive computation
-///     info!("the anwser was: {}", x);
-/// }
-/// ```
-fn main() {
-}
+fn main() {}
