@@ -19,8 +19,11 @@
 mod path;
 mod shell;
 
+use std::env::{self};
 use std::fs;
-use std::io::{self, Write};
+use std::path::Path;
+use std::process::Command;
+use std::io::{self, Write, stdin};
 
 use env_logger::Env;
 use shell::Shell;
@@ -29,7 +32,7 @@ use shell::Shell;
 const DEFAULT_LOG_LEVEL: &'static str = "error";
 
 fn main() {
-    env_logger::Builder::from_env(Env::default().default_filter_or("error")).init();
+    env_logger::Builder::from_env(Env::default().default_filter_or(DEFAULT_LOG_LEVEL)).init();
 
     let shell = Shell::new();
 
@@ -39,39 +42,64 @@ fn main() {
     let prefix = String::from(">>> ");
 
     'running: loop {
-        // holds whatever the user should choose to type in
-        // (right now its an empty buffer)
-        let mut buffer = String::new();
+        // print the prefix, whatever that may be
+        print!("{}", &prefix);
 
-        // create an input buffer
-        let stdin = io::stdin();
-
-        // Ensure the input buffer contents is loaded before reading into the string buffer
+        // Update buffer before reading
         io::stdout().flush().unwrap();
 
-        // copy the input buffer into the empty string buffer
-        stdin.read_line(&mut buffer).unwrap();
+        // create a stdin buffer
+        let mut stdinput = String::new();
 
-        match buffer.as_str() {
-            "clear" => {
-                unimplemented!()
-            }
-            "help" => {
-                unimplemented!()
-            }
-            "ashor" => {
-                unimplemented!()
-            }
+        // add input into stdin buffer
+        stdin().read_line(&mut stdinput).unwrap();
+
+        // Derive components from stdin
+        let mut components = stdinput.trim().split_whitespace();
+
+        // Derive the base component
+        let base = components.next().unwrap_or("");
+
+        match base {
+            "cd" => {
+                // default to '/' as new directory if one was not provided
+                let new_dir = components.peekable().peek().map_or("/", |x| *x);
+                let root = Path::new(new_dir);
+                if let Err(e) = env::set_current_dir(&root) {
+                    eprintln!("{}", e);
+                }
+            },
             "ls" => {
-                unimplemented!()
-            }
-            _ => {
-                // print out a new line
-                print!("{}", prefix);
+                // ls: iterate through files
+                //
+                // ref: https://doc.rust-lang.org/std/fs/struct.DirEntry.html
+                for entry in fs::read_dir(".").unwrap() {
+                    let dir = entry.unwrap();
+                    println!("{:?}", dir.path());
+                }
+            },
+            "quit" | "exit" => {
+                break 'running
+            },
+            // if a buffer loads into itself
+            base => {
+                // Execute a new instance of the command in base
+                let child = Command::new(base).
+                    args(components)
+                    .spawn();
+
+                // handle malformed input
+                let _ = match child {
+                    Ok(mut child) => {
+                        // await value
+                        child.wait()
+                    },
+                    Err(_) => { 
+                        continue
+                    }
+                };
+
             }
         }
-
-        // Once each case has been handled, clear the string inside the buffer
-        buffer.clear();
     }
 }
