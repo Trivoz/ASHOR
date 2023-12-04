@@ -13,8 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// #![allow(unused)]
 #![allow(non_snake_case)]
 
+mod path;
+mod shell;
 
 use log::{debug, error, info, log_enabled, Level};
 
@@ -37,4 +40,5 @@ use log::{debug, error, info, log_enabled, Level};
 ///     info!("the anwser was: {}", x);
 /// }
 /// ```
-fn main() {}
+fn main() {
+}
