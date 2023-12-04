@@ -8,4 +8,4 @@ edition = "2021"
 [dependencies]
 clap = { version = "4.4.10", features = ["derive"] }
 env_logger = "0.10.1"
-log = { version = "0.4.20", features = ["std"] }
+log = "0.4.20"

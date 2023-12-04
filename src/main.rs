@@ -14,6 +14,18 @@
  * limitations under the License.
  */
 
+use log::{debug, error, log_enabled, info, Level};
+
+
+
 fn main() {
-    println!("Hello, world!");
+    env_logger::init();
+
+    debug!("This is a debug {}", "message");
+    error!("This is printed by default");
+
+    if log_enabled!(Level::Info) {
+        let x = 3 * 4; // expensive computation
+        info!("the anwser was: {}", x);
+    }
 }
